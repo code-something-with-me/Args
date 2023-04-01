@@ -2,8 +2,7 @@ package code.with.me.args;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ArgumentParserTest {
 
@@ -33,13 +32,35 @@ class ArgumentParserTest {
         assertFalse(booleanOption.logging());
     }
 
+    @Test
+    void should_parse_int_as_option_value() {
+        var argumentParser = new ArgumentParser();
+        IntOption intOption = argumentParser.parse(IntOption.class, "-p", "8080");
+        assertEquals(8080, intOption.port());
+    }
 
-//    Test with only port specified:
-//    Input: -p 8080
-//    Expected Output: Port set to 8080, and other parameters set to default values.
-//    Test with only log directory specified:
-//    Input: -d /usr/logs
-//    Expected Output: Log directory set to "/usr/logs", and other parameters set to default values.
+    @Test
+    void should_parse_string_as_option_value() {
+        var argumentParser = new ArgumentParser();
+        StringOption stringOption = argumentParser.parse(StringOption.class, "-d", "/usr/logs");
+        assertEquals("/usr/logs", stringOption.directory());
+    }
+
+    @Test
+    void should_parse_multi_options() {
+        var argumentParser = new ArgumentParser();
+        MultiOptions multiOptions = argumentParser.parse(MultiOptions.class, "-l", "-p", "8080", "-d", "/usr/logs");
+        assertTrue(multiOptions.logging());
+        assertEquals(8080, multiOptions.port());
+        assertEquals("/usr/logs", multiOptions.directory());
+    }
+}
+
+record MultiOptions(@Option("-l") boolean logging, @Option("-p") int port, @Option("-d") String directory) {
+
+}
+
+record StringOption(@Option("-d") String directory) {
 
 }
 
@@ -48,3 +69,6 @@ record BooleanOption(@Option("-l") boolean logging) {
 
 }
 
+record IntOption(@Option("-p") int port) {
+
+}
