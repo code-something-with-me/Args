@@ -6,10 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ArgumentParserTest {
 
-
-//    Test with mix order arguments:
-//    Input: -p 8080 -l -d /usr/logs
-
     @Test
     void should_set_true_as_option_value() {
         var argumentParser = new ArgumentParser();
@@ -46,6 +42,16 @@ class ArgumentParserTest {
         assertEquals(8080, multiOptions.port());
         assertEquals("/usr/logs", multiOptions.directory());
     }
+
+    @Test
+    void should_parse_multi_in_mix_order_arguments() {
+        var argumentParser = new ArgumentParser();
+        MultiOptions multiOptions = argumentParser.parse(MultiOptions.class, "-p", "8080", "-l", "-d", "/usr/logs");
+        assertTrue(multiOptions.logging());
+        assertEquals(8080, multiOptions.port());
+        assertEquals("/usr/logs", multiOptions.directory());
+    }
+
 }
 
 record MultiOptions(@Option("-l") boolean logging, @Option("-p") int port, @Option("-d") String directory) {
