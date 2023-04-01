@@ -25,21 +25,18 @@ public class ArgumentParser {
     }
 
     private Object parseOption(List<String> arguments, Parameter parameter) {
-        return getValue(arguments, parameter.getAnnotation(Option.class));
-    }
-
-    private Object getValue(List<String> arguments, Option option) {
+        Option option = parameter.getAnnotation(Option.class);
         Object value = null;
-        if ("-l".equals(option.value())) {
+        if (parameter.getType() == boolean.class) {
             value = arguments.contains(option.value());
         }
 
-        if ("-p".equals(option.value())) {
+        if (parameter.getType() == int.class) {
             int idx = arguments.indexOf(option.value());
             value = Integer.parseInt(arguments.get(idx + 1));
         }
 
-        if ("-d".equals(option.value())) {
+        if (parameter.getType() == String.class) {
             int idx = arguments.indexOf(option.value());
             value = arguments.get(idx + 1);
         }
