@@ -10,8 +10,8 @@ import java.util.Map;
 public class ArgumentParser {
     private static final Map<Class<?>, OptionParser> PARSERS = Map.of(
             boolean.class, new BooleanOptionParser(),
-            int.class, new IntOptionParser(),
-            String.class, new StringOptionParser()
+            int.class, new SingleValueParser<>(Integer::parseInt),
+            String.class, new SingleValueParser<>(String::valueOf)
     );
 
 
