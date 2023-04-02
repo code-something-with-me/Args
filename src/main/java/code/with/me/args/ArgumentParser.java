@@ -32,8 +32,11 @@ public class ArgumentParser {
     }
 
     private Object parseOption(List<String> arguments, Parameter parameter) {
-        return PARSERS.get(parameter.getType())
-                .parse(arguments, parameter.getAnnotation(Option.class));
+        Option option = parameter.getAnnotation(Option.class);
+        if (option == null) {
+            throw new IllegalOptionException(parameter.getName());
+        }
+        return PARSERS.get(parameter.getType()).parse(arguments, option);
     }
 
 
