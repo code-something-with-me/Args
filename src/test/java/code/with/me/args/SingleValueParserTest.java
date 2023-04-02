@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SingleValueParserTest {
 
+    // sad path
     @Test
     void should_not_accept_extra_arguments_for_single_value_option() {
         TooManyArgumentsException e = assertThrows(TooManyArgumentsException.class,
@@ -20,6 +21,7 @@ class SingleValueParserTest {
         assertEquals("-p", e.getOption().value());
     }
 
+    // sad path
     @ParameterizedTest
     @ValueSource(strings = {"-p -d", "-p"})
     void should_not_accept_insufficient_arguments_for_single_value_option(String arguments) {
@@ -29,18 +31,16 @@ class SingleValueParserTest {
         assertEquals("-p", e.getOption().value());
     }
 
+    // default value
     @Test
     void should_set_default_value_as_0_if_int_option_is_not_present() {
         assertEquals(0, new SingleValueParser<>(0, Integer::parseInt).parse(List.of(), option("-p")));
     }
 
 
-    @Test
-    void should_not_accept_extra_arguments_for_string_single_value_option() {
-        TooManyArgumentsException e = assertThrows(TooManyArgumentsException.class,
-                () -> new SingleValueParser<>(0, Integer::parseInt)
-                        .parse(List.of("-d", "/usr/logs", "/usr/vars"), option("-d")));
-        assertEquals("-d", e.getOption().value());
+    @Test// happy path
+    void should_parse_value_if_option_is_present() {
+        assertEquals(8080, new SingleValueParser<>(0, Integer::parseInt).parse(List.of("-p", "8080"), option("-p")));
     }
 
 }
