@@ -9,9 +9,9 @@ import java.util.Map;
 
 public class ArgumentParser {
     private static final Map<Class<?>, OptionParser<?>> PARSERS = Map.of(
-            boolean.class, new BooleanOptionParser(),
-            int.class, new SingleValueParser<>(0, Integer::parseInt),
-            String.class, new SingleValueParser<>("", String::valueOf)
+            boolean.class, OptionParsers.bool(),
+            int.class, OptionParsers.unary(Integer::parseInt, 0),
+            String.class, OptionParsers.unary(String::valueOf, "")
     );
 
 
