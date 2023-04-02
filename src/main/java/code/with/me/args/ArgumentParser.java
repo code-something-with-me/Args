@@ -1,5 +1,6 @@
 package code.with.me.args;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -8,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ArgumentParser {
-    private static final Map<Class<?>, OptionParser> PARSERS = Map.of(
+    private static final Map<Class<?>, OptionParser<?>> PARSERS = Map.of(
             boolean.class, new BooleanOptionParser(),
-            int.class, new SingleValueParser<>(Integer::parseInt),
-            String.class, new SingleValueParser<>(String::valueOf)
+            int.class, new SingleValueParser<>(0, Integer::parseInt),
+            String.class, new SingleValueParser<>("", String::valueOf)
     );
 
 
