@@ -1,5 +1,6 @@
 package code.with.me.args;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,10 +8,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class ArgumentParserTest {
 
 
+    private ArgumentParser argumentParser;
+
+    @BeforeEach
+    void setUp() {
+        argumentParser = new ArgumentParser();
+    }
+
     @Test
     void should_parse_multi_options() {
-        var argumentParser = new ArgumentParser();
-        MultiOptions multiOptions = argumentParser.parse(MultiOptions.class, "-l", "-p", "8080", "-d", "/usr/logs");
+        MultiOptions multiOptions = this.argumentParser.parse(MultiOptions.class, "-l", "-p", "8080", "-d", "/usr/logs");
         assertTrue(multiOptions.logging());
         assertEquals(8080, multiOptions.port());
         assertEquals("/usr/logs", multiOptions.directory());
@@ -18,8 +25,7 @@ class ArgumentParserTest {
 
     @Test
     void should_parse_multi_in_mix_order_arguments() {
-        var argumentParser = new ArgumentParser();
-        MultiOptions multiOptions = argumentParser.parse(MultiOptions.class, "-p", "8080", "-l", "-d", "/usr/logs");
+        MultiOptions multiOptions = this.argumentParser.parse(MultiOptions.class, "-p", "8080", "-l", "-d", "/usr/logs");
         assertTrue(multiOptions.logging());
         assertEquals(8080, multiOptions.port());
         assertEquals("/usr/logs", multiOptions.directory());
@@ -27,15 +33,13 @@ class ArgumentParserTest {
 
     @Test
     void should_throw_exception_if_option_annotation_is_not_present() {
-        var argumentParser = new ArgumentParser();
         IllegalOptionException e = assertThrows(IllegalOptionException.class,
-                () -> argumentParser.parse(MultiOptionsWithoutAnnotation.class, "-l", "-p", "8080", "-d", "/usr/logs"));
+                () -> this.argumentParser.parse(MultiOptionsWithoutAnnotation.class, "-l", "-p", "8080", "-d", "/usr/logs"));
         assertEquals("logging", e.getParameter());
     }
 
     @Test
     void should_parse_list_options() {
-        var argumentParser = new ArgumentParser();
         ListOptions listOptions = argumentParser.parse(ListOptions.class, "-g", "admin", "root", "-d", "-1", "1", "2", "3");
         assertArrayEquals(new String[]{"admin", "root"}, listOptions.group());
         assertArrayEquals(new Integer[]{-1, 1, 2, 3}, listOptions.decimals());
