@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +34,7 @@ class OptionParsersTest {
         }
 
         @Test
-        void should_set_default_value_as_0_if_int_option_is_not_present() {
+        void should_set_default_value_as_0_if_arguments_is_empty() {
             assertEquals(0, OptionParsers.unary(Integer::parseInt, 0).parse(List.of(), option("-p")));
         }
 
@@ -57,17 +58,47 @@ class OptionParsersTest {
         }
 
         @Test
-            // default value
-        void should_set_default_value_as_false_if_option_is_not_present() {
+        void should_set_default_value_as_false_if_arguments_is_empty() {
             assertFalse(OptionParsers.bool().parse(List.of(), option("-l")));
         }
 
         @Test
-            // happy path
         void should_set_value_as_true_if_option_is_present() {
             assertTrue(OptionParsers.bool().parse(List.of("-l"), option("-l")));
         }
 
+
+    }
+
+    @Nested
+    class ListOptionParser {
+
+        @Test
+        void should_parse_list_value() {
+            String[] parse = OptionParsers.list(String[]::new, String::valueOf).parse(List.of("-g", "this", "is", "a", "list"), option("-g"));
+            assertArrayEquals(new String[]{"this", "is", "a", "list"}, parse);
+        }
+
+        @Test
+        void should_set_default_value_as_empty_list_if_arguments_is_empty() {
+            assertArrayEquals(new String[]{}, OptionParsers.list(String[]::new, String::valueOf).parse(List.of(), option("-g")));
+        }
+
+        @Test
+        void should_throw_exception_if_value_parser_cannot_parse_list_value() {
+            Function<String, String> valueParser = value -> {
+                throw new RuntimeException();
+            };
+            IllegalValueException e = assertThrows(IllegalValueException.class,
+                    () -> OptionParsers.list(String[]::new, valueParser).parse(List.of("-g", "this", "is", "a", "list"), option("-g")));
+            assertEquals("-g", e.getOption().value());
+            assertEquals("this", e.getValue());
+        }
+
+        @Test
+        void should_not_treat_negative_number_as_option() {
+            assertArrayEquals(new String[]{"-1", "-2"}, OptionParsers.list(String[]::new, String::valueOf).parse(List.of("-g", "-1", "-2"), option("-g")));
+        }
 
     }
 

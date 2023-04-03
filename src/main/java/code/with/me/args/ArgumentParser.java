@@ -11,7 +11,10 @@ public class ArgumentParser {
     private static final Map<Class<?>, OptionParser<?>> PARSERS = Map.of(
             boolean.class, OptionParsers.bool(),
             int.class, OptionParsers.unary(Integer::parseInt, 0),
-            String.class, OptionParsers.unary(String::valueOf, "")
+            String.class, OptionParsers.unary(String::valueOf, ""),
+            String[].class, OptionParsers.list(String[]::new, String::valueOf),
+            Integer[].class, OptionParsers.list(Integer[]::new, Integer::parseInt),
+            int[].class, OptionParsers.list(Integer[]::new, Integer::parseInt)
     );
 
 
@@ -35,6 +38,9 @@ public class ArgumentParser {
         Option option = parameter.getAnnotation(Option.class);
         if (option == null) {
             throw new IllegalOptionException(parameter.getName());
+        }
+        if (!PARSERS.containsKey(parameter.getType())) {
+            throw new UnsupportedOptionTypeException(option, parameter.getType());
         }
         return PARSERS.get(parameter.getType()).parse(arguments, option);
     }

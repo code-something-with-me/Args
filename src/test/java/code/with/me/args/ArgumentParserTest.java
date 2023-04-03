@@ -28,9 +28,22 @@ class ArgumentParserTest {
     @Test
     void should_throw_exception_if_option_annotation_is_not_present() {
         var argumentParser = new ArgumentParser();
-        IllegalOptionException e = assertThrows(IllegalOptionException.class, () -> argumentParser.parse(MultiOptionsWithoutAnnotation.class, "-l", "-p", "8080", "-d", "/usr/logs"));
+        IllegalOptionException e = assertThrows(IllegalOptionException.class,
+                () -> argumentParser.parse(MultiOptionsWithoutAnnotation.class, "-l", "-p", "8080", "-d", "/usr/logs"));
         assertEquals("logging", e.getParameter());
     }
+
+    @Test
+    void should_parse_list_options() {
+        var argumentParser = new ArgumentParser();
+        ListOptions listOptions = argumentParser.parse(ListOptions.class, "-g", "admin", "root", "-d", "-1", "1", "2", "3");
+        assertArrayEquals(new String[]{"admin", "root"}, listOptions.group());
+        assertArrayEquals(new Integer[]{-1, 1, 2, 3}, listOptions.decimals());
+    }
+
+}
+
+record ListOptions(@Option("-g") String[] group, @Option("-d") Integer[] decimals) {
 
 }
 
